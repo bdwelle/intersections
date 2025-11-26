@@ -22,5 +22,7 @@ system requirements
 5. publish interview
     1. publish a post which becomes available as as discrete web page, in a list, and on a clickable map of the city 
 
+The visual design should be kind of blown out street photography with fish eye, wide angle lens, high contrast, black and white, where the street signs are kind of blown up like helicopter blades and they're they're lit by flash or the glow of street lights at night through the fog, or evening light at the golden hour, an hour before sunset. 
+
 Propose an open-source system architecture, specifically addressing each of the requirements and how you would build that. 
 
