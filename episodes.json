@@ -2,7 +2,7 @@
   {
     "status": "published",
     "publishDate": "20260909",
-    "epNum": "S1 · E01",
+    "epNum": "S101 · E01",
     "title": "Mani Niall",
     "where": "Fell & Stanyan",
     "desc": "Chef, Baker, ",
@@ -14,7 +14,7 @@
   {
     "status": "published",
     "publishDate": "20260923",
-    "epNum": "S1 · E02",
+    "epNum": "S101 · E02",
     "title": "Maria Finn",
     "where": "Fort Point",
     "desc": "Author, Chef, Forager",
@@ -25,7 +25,7 @@
   },
   {
     "status": "upcoming",
-    "epNum": "S1 · E03",
+    "epNum": "S101 · E03",
     "title": "Chris Ryan",
     "where": "Hayes & Broderick",
     "desc": "Author, Podcaster",
@@ -36,7 +36,7 @@
   },
   {
     "status": "upcoming",
-    "epNum": "S1 · E04",
+    "epNum": "S101 · E04",
     "title": "James Brown",
     "where": "Hawk Hill, Conzelman Rd, Marin Headlands",
     "desc": "Founder of Vedic Path Meditation and author of 'Meditation Made Me Do It'",
@@ -47,7 +47,7 @@
   },
   {
     "status": "upcoming",
-    "epNum": "S1 · E05",
+    "epNum": "S101 · E05",
     "title": "Christian Routzen",
     "where": "Divisadero & Fell, NoPa",
     "desc": "Founder of San Franpsycho streetwear and screen printing.",
@@ -58,7 +58,7 @@
   },
   {
     "status": "upcoming",
-    "epNum": "S1 · E06",
+    "epNum": "S101 · E06",
     "title": "Stacy Horne",
     "where": "29th St & Tiffany Ave, Mission",
     "desc": "Music producer and festival organizer @ Noise Pop, The Battery, Stern Grove Festival.",
@@ -68,7 +68,7 @@
   },
   {
     "status": "upcoming",
-    "epNum": "S1 · E07",
+    "epNum": "S101 · E07",
     "title": "Stuart Schuffman",
     "where": "Mission & Precita",
     "desc": "Broke Ass Stuart",
@@ -79,7 +79,7 @@
   },
   {
     "status": "upcoming",
-    "epNum": "S1 · E08",
+    "epNum": "S101 · E08",
     "title": "Marc Capelle",
     "where": "24th & Poplar",
     "desc": "Musician",
@@ -90,7 +90,7 @@
   },
   {
     "status": "upcoming",
-    "epNum": "S1 · E09",
+    "epNum": "S101 · E09",
     "title": "Jeff Hunt",
     "where": "California & Larkin",
     "desc": "Host: Storied SF",
@@ -101,7 +101,7 @@
   },
   {
     "status": "upcoming",
-    "epNum": "S1 · E10",
+    "epNum": "S101 · E10",
     "title": "Bowen Dwelle",
     "where": "Franklin & Eddy",
     "desc": "Writer, Producer of Intersections SF",
