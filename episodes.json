@@ -1,0 +1,113 @@
+[
+  {
+    "status": "published",
+    "publishDate": "20260909",
+    "epNum": "S1 · E01",
+    "title": "Mani Niall",
+    "where": "Fell & Stanyan",
+    "desc": "Chef, Baker, ",
+    "url": "https://www.storiedsf.com/intersections/mani-niall",
+    "year": 2003,
+    "lat": 37.771469,
+    "lng": -122.454569
+  },
+  {
+    "status": "published",
+    "publishDate": "20260923",
+    "epNum": "S1 · E02",
+    "title": "Maria Finn",
+    "where": "Fort Point",
+    "desc": "Author, Chef, Forager",
+    "url": "https://www.storiedsf.com/intersections/maria-finn",
+    "year": 2019,
+    "lat": 37.8104,
+    "lng": -122.476606
+  },
+  {
+    "status": "upcoming",
+    "epNum": "S1 · E03",
+    "title": "Chris Ryan",
+    "where": "Hayes & Broderick",
+    "desc": "Author, Podcaster",
+    "url": "https://www.storiedsf.com/intersections/chris-ryan",
+    "year": 1989,
+    "lat": 37.774822,
+    "lng": -122.439483
+  },
+  {
+    "status": "upcoming",
+    "epNum": "S1 · E04",
+    "title": "James Brown",
+    "where": "Hawk Hill, Conzelman Rd, Marin Headlands",
+    "desc": "Founder of Vedic Path Meditation and author of 'Meditation Made Me Do It'",
+    "url": "https://www.storiedsf.com/intersections/james-brown",
+    "year": 2011,
+    "lat": 37.82754,
+    "lng": -122.498925
+  },
+  {
+    "status": "upcoming",
+    "epNum": "S1 · E05",
+    "title": "Christian Routzen",
+    "where": "Divisadero & Fell, NoPa",
+    "desc": "Founder of San Franpsycho streetwear and screen printing.",
+    "url": "https://www.storiedsf.com/intersections/christian-routzen",
+    "year": 2012,
+    "lat": 37.774084,
+    "lng": -122.437634
+  },
+  {
+    "status": "upcoming",
+    "epNum": "S1 · E06",
+    "title": "Stacy Horne",
+    "where": "29th St & Tiffany Ave, Mission",
+    "desc": "Music producer and festival organizer @ Noise Pop, The Battery, Stern Grove Festival.",
+    "url": "https://www.storiedsf.com/intersections/stacy-horne",
+    "lat": 37.744022,
+    "lng": -122.421944
+  },
+  {
+    "status": "upcoming",
+    "epNum": "S1 · E07",
+    "title": "Stuart Schuffman",
+    "where": "Mission & Precita",
+    "desc": "Broke Ass Stuart",
+    "url": "https://www.storiedsf.com/intersections/stuart-schuffman",
+    "year": 2017,
+    "lat": 37.746799,
+    "lng": -122.419129
+  },
+  {
+    "status": "upcoming",
+    "epNum": "S1 · E08",
+    "title": "Marc Capelle",
+    "where": "24th & Poplar",
+    "desc": "Musician",
+    "url": "https://www.storiedsf.com/intersections/marc-capelle",
+    "year": 2016,
+    "lat": 37.752095,
+    "lng": -122.421151
+  },
+  {
+    "status": "upcoming",
+    "epNum": "S1 · E09",
+    "title": "Jeff Hunt",
+    "where": "California & Larkin",
+    "desc": "Host: Storied SF",
+    "url": "https://www.storiedsf.com/intersections/jeff-hunt",
+    "year": 2000,
+    "lat": 37.79082,
+    "lng": -122.41907
+  },
+  {
+    "status": "upcoming",
+    "epNum": "S1 · E10",
+    "title": "Bowen Dwelle",
+    "where": "Franklin & Eddy",
+    "desc": "Writer, Producer of Intersections SF",
+    "url": "https://www.storiedsf.com/intersections/bowen-dwelle",
+    "year": 1989,
+    "lat": 37.782695,
+    "lng": -122.422482
+  }
+]

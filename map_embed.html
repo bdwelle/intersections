@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Intersections — Storied: San Francisco</title>
+
+        <!-- Leaflet CSS -->
+        <link
+            rel="stylesheet"
+            href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+            crossorigin=""
+        />
+
+        <style>
+            /* ========== Storied SF — Intersections page styles ========== */
+            /* Brand color (matches Storied SF orange logo) */
+            :root {
+                --storied-orange: #f04a00;
+                --storied-orange-light: #efa381;
+                --storied-orange-dark: #c33c00;
+                --ink: #1a1a1a;
+                --muted: #666;
+                --line: #e5e5e5;
+                --bg-soft: #faf9f7;
+            }
+
+            /* This page-wrapper is what you paste into a Squarespace Code Block.
+     Scoping everything under .storied-intersections avoids stomping on
+     Squarespace's own page chrome. */
+            .storied-intersections {
+                font-family:
+                    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                    "Helvetica Neue", Arial, sans-serif;
+                color: var(--ink);
+                max-width: 1100px;
+                margin: 0 auto;
+                padding: 0 16px;
+                line-height: 1.5;
+            }
+
+            .storied-intersections h1 {
+                font-size: clamp(1.8rem, 4vw, 2.6rem);
+                margin: 0 0 0.25em;
+                letter-spacing: -0.01em;
+            }
+            .storied-intersections .intro {
+                color: var(--muted);
+                margin: 0 0 1.5em;
+                font-size: 1.05rem;
+                max-width: 60ch;
+            }
+
+            /* ---------- Map ---------- */
+            #storied-map {
+                width: 100%;
+                height: 540px;
+                border-radius: 8px;
+                border: 1px solid var(--line);
+                box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+                margin-bottom: 0.75em;
+                z-index: 1; /* keep below Squarespace nav */
+            }
+
+            @media (max-width: 640px) {
+                #storied-map {
+                    height: 420px;
+                }
+            }
+
+            .map-legend {
+                display: flex;
+                flex: 0 0 auto;
+                align-items: center;
+                gap: 14px;
+                font-size: 0.9rem;
+                color: var(--muted);
+                margin-bottom: 0;
+                flex-wrap: wrap;
+            }
+            .map-legend .pin-swatch {
+                display: inline-block;
+                width: 14px;
+                height: 14px;
+                border: 2px solid white;
+                border-radius: 50%;
+                margin-right: 6px;
+                vertical-align: middle;
+            }
+            .map-legend .pin-swatch.published {
+                background: var(--storied-orange);
+                box-shadow: 0 0 0 1px var(--storied-orange);
+            }
+            .map-legend .pin-swatch.upcoming {
+                background: var(--storied-orange-light);
+                box-shadow: 0 0 0 1px var(--storied-orange-light);
+            }
+            .map-legend .legend-tip {
+                color: var(--muted);
+            }
+
+            /* ---------- Custom Leaflet popup ---------- */
+            .leaflet-popup-content-wrapper {
+                border-radius: 6px;
+                padding: 0;
+            }
+            .leaflet-popup-content {
+                margin: 0;
+                width: 260px !important;
+            }
+            .popup-card {
+                padding: 14px 16px 12px;
+                font-family: inherit;
+            }
+            .popup-card .ep-tag {
+                display: inline-block;
+                font-size: 0.7rem;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                color: var(--storied-orange);
+                font-weight: 700;
+                margin-bottom: 4px;
+            }
+            .popup-card .ep-title {
+                font-size: 1.05rem;
+                font-weight: 700;
+                margin: 0 0 4px;
+                color: var(--ink);
+                line-height: 1.25;
+            }
+            .popup-card .ep-where {
+                font-size: 0.85rem;
+                color: var(--muted);
+                margin: 0 0 8px;
+            }
+            .popup-card .ep-desc {
+                font-size: 0.9rem;
+                color: var(--ink);
+                margin: 0 0 10px;
+            }
+            .popup-card .ep-link {
+                display: inline-block;
+                background: var(--storied-orange);
+                color: white;
+                text-decoration: none;
+                padding: 7px 12px;
+                border-radius: 4px;
+                font-size: 0.85rem;
+                font-weight: 600;
+                transition: background 0.15s ease;
+            }
+            .popup-card .ep-link:hover {
+                background: var(--storied-orange-dark);
+                color: white;
+            }
+            .popup-card .ep-link.ep-link-upcoming {
+                background: var(--storied-orange-light);
+                cursor: default;
+            }
+            .popup-card .ep-link.ep-link-upcoming:hover {
+                background: var(--storied-orange-light);
+            }
+
+            /* Episode-list styles removed — the list is a Squarespace Summary Block in Setup B */
+        </style>
+    </head>
+    <body style="margin: 0; padding: 0; background: transparent">
+        <!-- ========================================================
+     PASTE EVERYTHING BELOW THIS LINE INTO A SQUARESPACE CODE BLOCK
+     ======================================================== -->
+
+        <div class="storied-intersections">
+            <!-- Map container -->
+            <div
+                id="storied-map"
+                role="region"
+                aria-label="Map of Intersections episodes"
+            ></div>
+
+            <div class="map-legend">
+                <span class="legend-tip"
+                    >Click a pin to learn about that episode. Drag to pan,
+                    scroll or pinch to zoom.</span
+                >
+            </div>
+        </div>
+        <!-- The episode list below is a separate Squarespace Summary Block -->
+
+        <!-- Leaflet JS -->
+        <script
+            src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            crossorigin=""
+        ></script>
+
+        <script>
+            (function () {
+                // If Leaflet failed to load (CDN blocked, sandbox restriction, no network),
+                // show a visible message instead of a blank map.
+                if (typeof L === "undefined") {
+                    var el = document.getElementById("storied-map");
+                    if (el) {
+                        el.style.display = "flex";
+                        el.style.alignItems = "center";
+                        el.style.justifyContent = "center";
+                        el.style.flexDirection = "column";
+                        el.style.padding = "20px";
+                        el.style.textAlign = "center";
+                        el.style.color = "#666";
+                        el.innerHTML =
+                            '<div><strong style="color:#1a1a1a;display:block;margin-bottom:6px;">Map library didn\u2019t load</strong>' +
+                            "The map needs to fetch Leaflet from unpkg.com. If you\u2019re viewing this inside " +
+                            "a sandboxed preview, that\u2019s blocked \u2014 try opening the file directly in your " +
+                            "browser, or paste into a live Squarespace page.</div>";
+                    }
+                    return;
+                }
+
+                try {
+                    /* =========================================================
+     EPISODE DATA SOURCE
+     ---------------------------------------------------------
+     Episode data lives in a separate JSON file hosted on GitHub.
+     Edit the file there (no need to touch this Squarespace block)
+     and refresh this page to see updates.
+
+     The raw URL below is fetched on page load. To point at a
+     different file or host, change this one line.
+
+     Cache-buster (?t=...) is added to defeat GitHub's CDN cache
+     so edits show up immediately rather than after the CDN expires.
+     ========================================================= */
+                    const EPISODES_URL =
+                        "https://gist.githubusercontent.com/bdwelle/70ec0e95fb865dad20405d49a9801cf9/raw/e07b424af7a0ffb950f8620de3aa3e47b6a4a3c3/episodes.json";
+
+                    /* Each entry in EPISODES_URL has these fields:
+       - status      : "published" | "upcoming" | "tbd"
+                       (only "published" appears on the page)
+       - publishDate : optional "YYYYMMDD" string, e.g. "20260909".
+                       A "published" episode whose publishDate is in the
+                       future is still shown as an upcoming (light-orange)
+                       pin until that date arrives — lets episodes be
+                       marked published ahead of their on-site release.
+       - epNum       : e.g. "S1 · E02" (used for sorting)
+       - title       : guest name or episode title
+       - where       : displayed under the title; e.g. "Haight & Ashbury"
+       - desc        : one-liner shown in the popup
+       - url         : storiedsf.com episode page URL (required when published)
+       - lat, lng    : decimal coordinates for the map pin
+                       (omit for entries that have no fixed location yet)
+     */
+
+                    /* =========================================================
+     MAP SETUP — happens immediately, before data loads
+     ========================================================= */
+
+                    // Center the map on the geographic middle of SF
+                    const SF_CENTER = [37.7749, -122.4394];
+
+                    const map = L.map("storied-map", {
+                        center: SF_CENTER,
+                        zoom: 13,
+                        scrollWheelZoom: true,
+                        zoomControl: true,
+                    });
+
+                    // Carto Voyager — clean, light, neighborhood labels visible.
+                    // Free, no API key. Carto's attribution is required.
+                    L.tileLayer(
+                        "https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png?key=cb1_277j_1_6b1ed3e310bfd59e7fd8762a",
+                        {
+                            attribution:
+                                '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                            subdomains: "abcd",
+                            maxZoom: 19,
+                        },
+                    ).addTo(map);
+
+                    /* Custom pin matching Storied SF branding.
+     Built as inline SVG so there's no extra asset to host.
+     Accent color is parameterized so "upcoming" pins can reuse
+     the same shape in storied-orange-light. */
+                    function makePinSvg(accentColor) {
+                        return `
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 34 34" width="34" height="34">
+    <g stroke="#ffffff" stroke-width="3" stroke-linecap="round" fill="none">
+      <path d="M4 10 L4 4 L10 4"/>
+      <path d="M24 4 L30 4 L30 10"/>
+      <path d="M30 24 L30 30 L24 30"/>
+      <path d="M10 30 L4 30 L4 24"/>
+    </g>
+    <g stroke="${accentColor}" stroke-width="1.5" stroke-linecap="round" fill="none">
+      <path d="M4 10 L4 4 L10 4"/>
+      <path d="M24 4 L30 4 L30 10"/>
+      <path d="M30 24 L30 30 L24 30"/>
+      <path d="M10 30 L4 30 L4 24"/>
+    </g>
+    <g transform="translate(3 3)">
+      <path d="M6 6 L22 22 M22 6 L6 22" stroke="#ffffff" stroke-width="8" stroke-linecap="round"/>
+      <path d="M6 6 L22 22 M22 6 L6 22" stroke="${accentColor}" stroke-width="5" stroke-linecap="round"/>
+    </g>
+  </svg>`;
+                    }
+
+                    const iconPublished = L.divIcon({
+                        className: "storied-pin",
+                        html: makePinSvg("#f04a00"), // --storied-orange
+                        iconSize: [34, 34], // was [32, 44] — La is square, not a teardrop
+                        iconAnchor: [17, 17], // was [16, 44] — center, not bottom tip
+                        popupAnchor: [0, -20], // was [0, -40] — open popup above center
+                    });
+
+                    const iconUpcoming = L.divIcon({
+                        className: "storied-pin storied-pin-upcoming",
+                        html: makePinSvg("#efa381"), // --storied-orange-light
+                        iconSize: [34, 34],
+                        iconAnchor: [17, 17],
+                        popupAnchor: [0, -20],
+                    });
+
+                    /* =========================================================
+     FETCH DATA, THEN RENDER MAP PINS
+     ---------------------------------------------------------
+     The map is already on screen at this point. We fetch the
+     episodes file, then drop a pin for each published episode
+     that has coordinates.
+
+     NOTE: This is the "Setup B" map-only build. The episode
+     LIST is rendered separately by a Squarespace Summary Block
+     placed below this Code Block — it is not part of this file.
+     ========================================================= */
+
+                    fetch(EPISODES_URL + "?t=" + Date.now())
+                        .then((r) => {
+                            if (!r.ok)
+                                throw new Error(
+                                    "HTTP " + r.status + " loading episodes",
+                                );
+                            return r.json();
+                        })
+                        .then((episodes) => {
+                            if (!Array.isArray(episodes)) {
+                                throw new Error(
+                                    "Episodes file did not return an array",
+                                );
+                            }
+                            renderPins(episodes);
+                        })
+                        .catch((err) => {
+                            console.error(
+                                "Storied Intersections: failed to load episodes",
+                                err,
+                            );
+                            // Map stays usable even if data fails; just no pins.
+                        });
+
+                    /* =========================================================
+     RENDER MAP PINS
+     ========================================================= */
+                    function renderPins(episodes) {
+                        const bounds = [];
+                        const today = getTodayYYYYMMDD();
+
+                        // Show published episodes (require a url) and
+                        // upcoming episodes, as long as they have coordinates.
+                        // TBD episodes and anything without lat/lng are
+                        // skipped — the Summary Block list still shows all
+                        // tagged posts regardless.
+                        const visibleEpisodes = episodes.filter(
+                            (ep) =>
+                                (ep.status === "published" ||
+                                    ep.status === "upcoming") &&
+                                (ep.status !== "published" || ep.url) &&
+                                typeof ep.lat === "number" &&
+                                typeof ep.lng === "number",
+                        );
+
+                        visibleEpisodes.forEach((ep) => {
+                            // A "published" episode with a future publishDate
+                            // still displays as upcoming until that date.
+                            const isReleased =
+                                ep.status === "published" &&
+                                (!ep.publishDate ||
+                                    String(ep.publishDate) <= today);
+                            const isUpcoming = !isReleased;
+                            const isFutureDatedPublished =
+                                ep.status === "published" &&
+                                ep.publishDate &&
+                                String(ep.publishDate) > today;
+                            let ctaHtml;
+                            if (isFutureDatedPublished) {
+                                ctaHtml = `<span class="ep-link ep-link-upcoming">Story coming ${escapeHtml(formatPublishDate(ep.publishDate))}</span>`;
+                            } else if (isUpcoming) {
+                                ctaHtml = `<span class="ep-link ep-link-upcoming">Story coming soon…</span>`;
+                            } else {
+                                ctaHtml = `<a class="ep-link" href="${escapeAttr(ep.url)}">Check out the story →</a>`;
+                            }
+                            const popupHtml = `<div class="popup-card">
+               <span class="ep-tag">${escapeHtml(ep.epNum)}</span>
+               <h3 class="ep-title">${escapeHtml(ep.title)}</h3>
+               <p class="ep-where">${escapeHtml(ep.where)}</p>
+               <p class="ep-desc">${escapeHtml(ep.desc)}</p>
+               ${ctaHtml}
+             </div>`;
+
+                            L.marker([ep.lat, ep.lng], {
+                                icon: isUpcoming ? iconUpcoming : iconPublished,
+                                title: ep.title,
+                            })
+                                .addTo(map)
+                                .bindPopup(popupHtml, { maxWidth: 280 });
+
+                            bounds.push([ep.lat, ep.lng]);
+                        });
+
+                        // Fit the map to all pins (with a little padding)
+                        if (bounds.length > 1) {
+                            map.fitBounds(bounds, { padding: [40, 40] });
+                        } else if (bounds.length === 1) {
+                            map.setView(bounds[0], 15);
+                        }
+                    } // end renderPins
+
+                    /* =========================================================
+     UTILITIES
+     ========================================================= */
+                } catch (err) {
+                    // Visible error reporting — easier to debug than a silent failure
+                    var el = document.getElementById("storied-map");
+                    if (el) {
+                        el.style.display = "flex";
+                        el.style.alignItems = "center";
+                        el.style.justifyContent = "center";
+                        el.style.padding = "20px";
+                        el.style.textAlign = "center";
+                        el.style.color = "#c33c00";
+                        el.innerHTML =
+                            "<div><strong>Map failed to render</strong><br>" +
+                            '<small style="color:#666;">' +
+                            escapeHtml(String((err && err.message) || err)) +
+                            "</small></div>";
+                    }
+                    console.error("Storied Intersections map error:", err);
+                }
+
+                function getTodayYYYYMMDD() {
+                    const d = new Date();
+                    const y = d.getFullYear();
+                    const m = String(d.getMonth() + 1).padStart(2, "0");
+                    const day = String(d.getDate()).padStart(2, "0");
+                    return `${y}${m}${day}`;
+                }
+                const MONTH_ABBR = [
+                    "Jan",
+                    "Feb",
+                    "Mar",
+                    "Apr",
+                    "May",
+                    "Jun",
+                    "Jul",
+                    "Aug",
+                    "Sep",
+                    "Oct",
+                    "Nov",
+                    "Dec",
+                ];
+                function formatPublishDate(yyyymmdd) {
+                    const s = String(yyyymmdd);
+                    const y = s.slice(0, 4);
+                    const m = parseInt(s.slice(4, 6), 10);
+                    const day = s.slice(6, 8);
+                    return `${MONTH_ABBR[m - 1]} ${day}, ${y}`;
+                }
+                function escapeHtml(s) {
+                    return String(s).replace(
+                        /[&<>"']/g,
+                        (c) =>
+                            ({
+                                "&": "&amp;",
+                                "<": "&lt;",
+                                ">": "&gt;",
+                                '"': "&quot;",
+                                "'": "&#39;",
+                            })[c],
+                    );
+                }
+                function escapeAttr(s) {
+                    return escapeHtml(s);
+                }
+            })();
+        </script>
+    </body>
+</html>

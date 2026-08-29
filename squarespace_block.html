@@ -1,0 +1,77 @@
+<div id="storied-intersections-mount"></div>
+<script>
+(function () {
+    var SOURCE_URL =
+        "https://gist.githubusercontent.com/bdwelle/ce1181c79ba8a6d2f290ef86052f754b/raw/map_embed.html";
+    var MOUNT_ID = "storied-intersections-mount";
+
+    fetch(SOURCE_URL + "?t=" + Date.now())
+        .then(function (r) {
+            if (!r.ok) throw new Error("HTTP " + r.status + " loading embed");
+            return r.text();
+        })
+        .then(function (html) {
+            var doc = new DOMParser().parseFromString(html, "text/html");
+            var mount = document.getElementById(MOUNT_ID);
+            if (!mount)
+                throw new Error("Mount element #" + MOUNT_ID + " not found");
+
+            // Copy <style> blocks AND stylesheet <link> tags (e.g. Leaflet's
+            // own CSS) from the fetched <head> into this page's <head>.
+            doc
+                .querySelectorAll(
+                    'head style, head link[rel="stylesheet"]',
+                )
+                .forEach(function (el) {
+                    document.head.appendChild(el.cloneNode(true));
+                });
+
+            // Copy the visible body markup, skipping <script> tags (re-added
+            // below so they actually execute — scripts inserted via
+            // innerHTML are inert).
+            var scripts = Array.prototype.slice.call(
+                doc.body.querySelectorAll("script"),
+            );
+            scripts.forEach(function (s) {
+                s.remove();
+            });
+            mount.innerHTML = doc.body.innerHTML;
+
+            // Re-create <script> tags in original order. Src scripts
+            // (Leaflet) must finish loading before the inline script that
+            // depends on the global `L` runs.
+            (function runNext(i) {
+                if (i >= scripts.length) return;
+                var old = scripts[i];
+                var s = document.createElement("script");
+                if (old.src) {
+                    s.src = old.src;
+                    if (old.crossOrigin) s.crossOrigin = old.crossOrigin;
+                    s.onload = function () {
+                        runNext(i + 1);
+                    };
+                    s.onerror = function () {
+                        runNext(i + 1);
+                    };
+                    document.body.appendChild(s);
+                } else {
+                    s.textContent = old.textContent;
+                    document.body.appendChild(s);
+                    runNext(i + 1);
+                }
+            })(0);
+        })
+        .catch(function (err) {
+            var mount = document.getElementById(MOUNT_ID);
+            if (mount) {
+                mount.innerHTML =
+                    '<div style="padding:20px;text-align:center;color:#c33c00;">' +
+                    "<strong>Map failed to load</strong><br>" +
+                    '<small style="color:#666;">' +
+                    String((err && err.message) || err) +
+                    "</small></div>";
+            }
+            console.error("Storied Intersections: failed to load embed", err);
+        });
+})();
+</script>
