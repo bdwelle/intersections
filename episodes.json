@@ -5,7 +5,7 @@
     "epNum": "S101 · E01",
     "title": "Mani Niall",
     "where": "Fell & Stanyan",
-    "desc": "Chef, Baker, ",
+    "desc": "Author, Chef, Baker",
     "url": "https://www.storiedsf.com/intersections/mani-niall",
     "year": 2003,
     "lat": 37.771469,
@@ -24,10 +24,11 @@
     "lng": -122.476606
   },
   {
-    "status": "upcoming",
+    "status": "published",
+    "publishDate": "20261007",
     "epNum": "S101 · E03",
     "title": "Chris Ryan",
-    "where": "Hayes & Broderick",
+    "where": "Broderick & Hayes",
     "desc": "Author, Podcaster",
     "url": "https://www.storiedsf.com/intersections/chris-ryan",
     "year": 1989,
