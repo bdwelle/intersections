@@ -37,6 +37,7 @@
   },
   {
     "status": "upcoming",
+    "publishDate": "20261021",
     "epNum": "S101 · E04",
     "title": "James Brown",
     "where": "Hawk Hill, Conzelman Rd, Marin Headlands",
@@ -48,6 +49,7 @@
   },
   {
     "status": "upcoming",
+    "publishDate": "20261104",
     "epNum": "S101 · E05",
     "title": "Christian Routzen",
     "where": "Divisadero & Fell, NoPa",
@@ -59,6 +61,7 @@
   },
   {
     "status": "upcoming",
+    "publishDate": "20261118",
     "epNum": "S101 · E06",
     "title": "Stacy Horne",
     "where": "29th St & Tiffany Ave, Mission",
@@ -69,6 +72,7 @@
   },
   {
     "status": "upcoming",
+    "publishDate": "20261202",
     "epNum": "S101 · E07",
     "title": "Stuart Schuffman",
     "where": "Mission & Precita",
@@ -80,6 +84,7 @@
   },
   {
     "status": "upcoming",
+    "publishDate": "20261216",
     "epNum": "S101 · E08",
     "title": "Marc Capelle",
     "where": "24th & Poplar",
