@@ -2,7 +2,7 @@
   {
     "status": "published",
     "publishDate": "20260909",
-    "epNum": "S1 · E01",
+    "epNum": "S101 · E01",
     "title": "Mani Niall",
     "url": "https://www.storiedsf.com/intersections/mani-niall",
     "year": 2003,
@@ -12,7 +12,7 @@
   {
     "status": "published",
     "publishDate": "20260923",
-    "epNum": "S1 · E02",
+    "epNum": "S101 · E02",
     "title": "Maria Finn",
     "url": "https://www.storiedsf.com/intersections/maria-finn",
     "year": 2019,
@@ -20,8 +20,9 @@
     "lng": -122.476606
   },
   {
-    "status": "upcoming",
-    "epNum": "S1 · E03",
+    "status": "published",
+    "publishDate": "20261007",
+    "epNum": "S101 · E03",
     "title": "Chris Ryan's 'not really a realtor' story at Broderick and Hayes",
     "url": "https://www.storiedsf.com/intersections/chris-ryan",
     "year": 1989,
@@ -30,7 +31,8 @@
   },
   {
     "status": "upcoming",
-    "epNum": "S1 · E04",
+    "publishDate": "20261021",
+    "epNum": "S101 · E04",
     "title": "James Brown's 'How I met my son' story at Hawk Hill",
     "url": "https://www.storiedsf.com/intersections/james-brown",
     "year": 2011,
@@ -39,7 +41,8 @@
   },
   {
     "status": "upcoming",
-    "epNum": "S1 · E05",
+    "publishDate": "20261104",
+    "epNum": "S101 · E05",
     "title": "Christian Routzen's San Franpsycho origin story at Divisadero & Fell",
     "url": "https://www.storiedsf.com/intersections/christian-routzen",
     "year": 2012,
@@ -48,7 +51,8 @@
   },
   {
     "status": "upcoming",
-    "epNum": "S1 · E06",
+    "publishDate": "20261118",
+    "epNum": "S101 · E06",
     "title": "Stacy Horne's Rock Bar family story at 29th St & Tiffany",
     "url": "https://www.storiedsf.com/intersections/stacy-horne",
     "lat": 37.744022,
@@ -56,7 +60,8 @@
   },
   {
     "status": "upcoming",
-    "epNum": "S1 · E07",
+    "publishDate": "20261202",
+    "epNum": "S101 · E07",
     "title": "Stuart Schuffman's (Broke Ass Stuart) first-date story at Mission & Precita",
     "url": "https://www.storiedsf.com/intersections/stuart-schuffman",
     "year": 2017,
@@ -65,7 +70,8 @@
   },
   {
     "status": "upcoming",
-    "epNum": "S1 · E08",
+    "publishDate": "20261216",
+    "epNum": "S101 · E08",
     "title": "Marc Capelle's life in music at 24th & Poplar",
     "url": "https://www.storiedsf.com/intersections/marc-capelle",
     "year": 2016,
@@ -74,7 +80,7 @@
   },
   {
     "status": "upcoming",
-    "epNum": "S1 · E09",
+    "epNum": "S101 · E09",
     "title": "Jeff Hunt's coming to SF story at California & Larkin",
     "url": "https://www.storiedsf.com/intersections/jeff-hunt",
     "year": 2000,
@@ -83,7 +89,7 @@
   },
   {
     "status": "upcoming",
-    "epNum": "S1 · E10",
+    "epNum": "S101 · E10",
     "title": "Bowen Dwelle's car chase story at Franklin & Eddy",
     "url": "https://www.storiedsf.com/intersections/bowen-dwelle",
     "year": 1989,
