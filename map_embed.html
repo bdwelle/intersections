@@ -124,19 +124,17 @@
             .popup-card .ep-title {
                 font-size: 1.05rem;
                 font-weight: 700;
-                margin: 0 0 4px;
+                margin: 0 0 10px;
                 color: var(--ink);
                 line-height: 1.25;
             }
-            .popup-card .ep-where {
-                font-size: 0.85rem;
-                color: var(--muted);
-                margin: 0 0 8px;
-            }
-            .popup-card .ep-desc {
-                font-size: 0.9rem;
-                color: var(--ink);
-                margin: 0 0 10px;
+            .popup-card .ep-thumb {
+                display: block;
+                width: calc(100% + 32px);
+                height: 140px;
+                object-fit: cover;
+                border-radius: 6px 6px 0 0;
+                margin: -14px -16px 10px;
             }
             .popup-card .ep-link {
                 display: inline-block;
@@ -241,13 +239,78 @@
                        pin until that date arrives — lets episodes be
                        marked published ahead of their on-site release.
        - epNum       : e.g. "S1 · E02" (used for sorting)
-       - title       : guest name or episode title
-       - where       : displayed under the title; e.g. "Haight & Ashbury"
-       - desc        : one-liner shown in the popup
+       - title       : guest name or episode title, shown in the popup
+                       until a released episode's own page loads a
+                       richer title (see PIN POPUP CONTENT below)
        - url         : storiedsf.com episode page URL (required when published)
        - lat, lng    : decimal coordinates for the map pin
                        (omit for entries that have no fixed location yet)
      */
+
+                    /* =========================================================
+     PIN POPUP CONTENT — thumbnail + title from the episode's own page
+     ---------------------------------------------------------
+     For a released episode, the popup's title and photo come from
+     that episode's storiedsf.com page itself (its <meta property="og:*">
+     tags — the same fields Squarespace uses for social-share previews),
+     not from episodes.json. This keeps the map in sync with the actual
+     page without hand-copying a title/photo into the data file.
+
+     The fetch happens lazily, the first time a pin's popup is opened
+     (not for all pins up front), and only for episodes whose story is
+     actually live (isReleased below) — a "published" episode with a
+     future publishDate has no live page yet. Results are cached by
+     URL so reopening a pin doesn't refetch.
+
+     This only works once this file is actually running on
+     storiedsf.com — a browser only allows this scrape when it's
+     same-origin. Loaded from elsewhere (localhost, a Squarespace
+     preview on a different domain), the fetch fails and the popup
+     just keeps showing the episodes.json fallback below — which is
+     also what happens if the page has no og:image, or any other
+     fetch/parse error.
+     ========================================================= */
+                    const pageDataCache = {};
+
+                    function fetchPageData(url) {
+                        if (pageDataCache[url]) return pageDataCache[url];
+                        const promise = fetch(url)
+                            .then((r) => {
+                                if (!r.ok)
+                                    throw new Error("HTTP " + r.status);
+                                return r.text();
+                            })
+                            .then((html) => {
+                                const doc = new DOMParser().parseFromString(
+                                    html,
+                                    "text/html",
+                                );
+                                const rawTitle = doc
+                                    .querySelector('meta[property="og:title"]')
+                                    ?.getAttribute("content");
+                                const rawImage = doc
+                                    .querySelector('meta[property="og:image"]')
+                                    ?.getAttribute("content");
+                                const title = rawTitle
+                                    ? rawTitle
+                                          .replace(
+                                              /\s*[—-]\s*Storied:\s*San Francisco\s*$/,
+                                              "",
+                                          )
+                                          .trim()
+                                    : null;
+                                // Squarespace serves og:image over http:// —
+                                // upgrade to https to avoid mixed-content
+                                // blocking on this https page.
+                                const image = rawImage
+                                    ? rawImage.replace(/^http:/, "https:")
+                                    : null;
+                                return { title, image };
+                            })
+                            .catch(() => null);
+                        pageDataCache[url] = promise;
+                        return promise;
+                    }
 
                     /* =========================================================
      MAP SETUP — happens immediately, before data loads
@@ -394,20 +457,45 @@
                             } else {
                                 ctaHtml = `<a class="ep-link" href="${escapeAttr(ep.url)}">Check out the story →</a>`;
                             }
-                            const popupHtml = `<div class="popup-card">
+
+                            function buildPopupHtml(pageData) {
+                                const title =
+                                    (pageData && pageData.title) || ep.title;
+                                const thumbHtml =
+                                    pageData && pageData.image
+                                        ? `<img class="ep-thumb" src="${escapeAttr(pageData.image)}" alt="">`
+                                        : "";
+                                return `<div class="popup-card">
+               ${thumbHtml}
                <span class="ep-tag">${escapeHtml(ep.epNum)}</span>
-               <h3 class="ep-title">${escapeHtml(ep.title)}</h3>
-               <p class="ep-where">${escapeHtml(ep.where)}</p>
-               <p class="ep-desc">${escapeHtml(ep.desc)}</p>
+               <h3 class="ep-title">${escapeHtml(title)}</h3>
                ${ctaHtml}
              </div>`;
+                            }
 
-                            L.marker([ep.lat, ep.lng], {
+                            const marker = L.marker([ep.lat, ep.lng], {
                                 icon: isUpcoming ? iconUpcoming : iconPublished,
                                 title: ep.title,
                             })
                                 .addTo(map)
-                                .bindPopup(popupHtml, { maxWidth: 280 });
+                                .bindPopup(buildPopupHtml(null), {
+                                    maxWidth: 280,
+                                });
+
+                            // Only released episodes have a live page to
+                            // scrape a title/photo from.
+                            if (isReleased) {
+                                marker.on("popupopen", () => {
+                                    fetchPageData(ep.url).then((pageData) => {
+                                        if (!pageData) return;
+                                        marker
+                                            .getPopup()
+                                            .setContent(
+                                                buildPopupHtml(pageData),
+                                            );
+                                    });
+                                });
+                            }
 
                             bounds.push([ep.lat, ep.lng]);
                         });
