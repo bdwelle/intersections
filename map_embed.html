@@ -131,8 +131,7 @@
             .popup-card .ep-thumb {
                 display: block;
                 width: calc(100% + 32px);
-                height: 140px;
-                object-fit: cover;
+                height: auto;
                 border-radius: 6px 6px 0 0;
                 margin: -14px -16px 10px;
             }
@@ -485,14 +484,24 @@
                             // Only released episodes have a live page to
                             // scrape a title/photo from.
                             if (isReleased) {
-                                marker.on("popupopen", () => {
+                                marker.once("popupopen", () => {
                                     fetchPageData(ep.url).then((pageData) => {
                                         if (!pageData) return;
-                                        marker
-                                            .getPopup()
-                                            .setContent(
-                                                buildPopupHtml(pageData),
-                                            );
+                                        const openPopup = marker.getPopup();
+                                        openPopup.setContent(
+                                            buildPopupHtml(pageData),
+                                        );
+                                        // The photo can make the popup
+                                        // taller than when it first
+                                        // auto-panned into view above the
+                                        // pin — force a re-check now that
+                                        // it's grown.
+                                        if (
+                                            openPopup.isOpen() &&
+                                            openPopup._adjustPan
+                                        ) {
+                                            openPopup._adjustPan();
+                                        }
                                     });
                                 });
                             }
