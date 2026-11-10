@@ -157,8 +157,65 @@
             .popup-card .ep-link.ep-link-upcoming:hover {
                 background: var(--storied-orange-light);
             }
+            .popup-card .ep-link.ep-link-here {
+                background: var(--storied-orange);
+                color: white;
+                cursor: default;
+            }
+            .popup-card .ep-link.ep-link-here:hover {
+                background: var(--storied-orange);
+            }
 
             /* Episode-list styles removed — the list is a Squarespace Summary Block in Setup B */
+
+            /* ---------- "You are here" pulsing ring ----------
+     Wraps the normal pin icon on the episode page that matches
+     the current URL. The ring div is sized/centered independently
+     of the pin so the pin's own look (and map anchor point) don't
+     change. */
+            .storied-here-ring {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 34px;
+                height: 34px;
+                margin: -17px 0 0 -17px;
+                border-radius: 50%;
+                pointer-events: none;
+                animation: storied-here-pulse 1.8s cubic-bezier(
+                        0,
+                        0,
+                        0.2,
+                        1
+                    ) infinite;
+            }
+            .storied-here-ring.ring-delay {
+                animation-delay: -0.9s;
+            }
+            .storied-here-ring.ring-published {
+                background: rgba(240, 74, 0, 0.55);
+                box-shadow: 0 0 0 2px rgba(240, 74, 0, 0.9);
+            }
+            .storied-here-ring.ring-upcoming {
+                background: rgba(239, 163, 129, 0.6);
+                box-shadow: 0 0 0 2px rgba(239, 163, 129, 0.95);
+            }
+            @keyframes storied-here-pulse {
+                0% {
+                    transform: scale(0.8);
+                    opacity: 0.85;
+                }
+                100% {
+                    transform: scale(3);
+                    opacity: 0;
+                }
+            }
+            @media (prefers-reduced-motion: reduce) {
+                .storied-here-ring {
+                    animation: none;
+                    opacity: 0.4;
+                }
+            }
         </style>
     </head>
     <body style="margin: 0; padding: 0; background: transparent">
@@ -315,6 +372,12 @@
      MAP SETUP — happens immediately, before data loads
      ========================================================= */
 
+                    // While reviewing the "you are here" ring on its own,
+                    // leave the map framing as-is (same citywide fit on
+                    // every page). Flip to true to also center/zoom the
+                    // map on the current episode's pin.
+                    const FOCUS_ON_CURRENT_EPISODE = false;
+
                     // Center the map on the geographic middle of SF
                     const SF_CENTER = [37.7749, -122.4394];
 
@@ -379,6 +442,37 @@
                         popupAnchor: [0, -20],
                     });
 
+                    /* "You are here" variant — same pin, wrapped in a
+     pulsing ring, used only for the episode whose URL matches the
+     page the map is currently embedded on. */
+                    function makeHereIconHtml(accentColor, ringClass) {
+                        return `
+  <div style="position:relative;width:72px;height:72px;">
+    <div class="storied-here-ring ${ringClass}"></div>
+    <div class="storied-here-ring ${ringClass} ring-delay"></div>
+    <div style="position:absolute;top:50%;left:50%;width:34px;height:34px;margin:-17px 0 0 -17px;">
+      ${makePinSvg(accentColor)}
+    </div>
+  </div>`;
+                    }
+
+                    const iconHerePublished = L.divIcon({
+                        className: "storied-pin storied-pin-here",
+                        html: makeHereIconHtml("#f04a00", "ring-published"),
+                        iconSize: [72, 72],
+                        iconAnchor: [36, 36],
+                        popupAnchor: [0, -34],
+                    });
+
+                    const iconHereUpcoming = L.divIcon({
+                        className:
+                            "storied-pin storied-pin-here storied-pin-upcoming",
+                        html: makeHereIconHtml("#efa381", "ring-upcoming"),
+                        iconSize: [72, 72],
+                        iconAnchor: [36, 36],
+                        popupAnchor: [0, -34],
+                    });
+
                     /* =========================================================
      FETCH DATA, THEN RENDER MAP PINS
      ---------------------------------------------------------
@@ -422,6 +516,24 @@
                         const bounds = [];
                         const today = getTodayYYYYMMDD();
 
+                        // Detect whether this map is embedded on a specific
+                        // episode's own page (vs. the /intersections hub,
+                        // where nothing matches and behavior is unchanged).
+                        const currentPath = location.pathname.replace(
+                            /\/+$/,
+                            "",
+                        );
+                        function pathOf(url) {
+                            try {
+                                return new URL(
+                                    url,
+                                    location.origin,
+                                ).pathname.replace(/\/+$/, "");
+                            } catch (e) {
+                                return null;
+                            }
+                        }
+
                         // Show published episodes (require a url) and
                         // upcoming episodes, as long as they have coordinates.
                         // TBD episodes and anything without lat/lng are
@@ -436,7 +548,12 @@
                                 typeof ep.lng === "number",
                         );
 
+                        const currentEp = visibleEpisodes.find(
+                            (ep) => pathOf(ep.url) === currentPath,
+                        );
+
                         visibleEpisodes.forEach((ep) => {
+                            const isCurrent = ep === currentEp;
                             // A "published" episode with a future publishDate
                             // still displays as upcoming until that date.
                             const isReleased =
@@ -456,6 +573,12 @@
                             } else {
                                 ctaHtml = `<a class="ep-link" href="${escapeAttr(ep.url)}">Check out the story →</a>`;
                             }
+                            // On the episode's own page, its pin's popup
+                            // confirms location instead of linking back
+                            // to the page the visitor is already on.
+                            if (isCurrent) {
+                                ctaHtml = `<span class="ep-link ep-link-here">You are here</span>`;
+                            }
 
                             function buildPopupHtml(pageData) {
                                 const title =
@@ -472,9 +595,21 @@
              </div>`;
                             }
 
+                            let icon;
+                            if (isCurrent) {
+                                icon = isUpcoming
+                                    ? iconHereUpcoming
+                                    : iconHerePublished;
+                            } else {
+                                icon = isUpcoming
+                                    ? iconUpcoming
+                                    : iconPublished;
+                            }
+
                             const marker = L.marker([ep.lat, ep.lng], {
-                                icon: isUpcoming ? iconUpcoming : iconPublished,
+                                icon: icon,
                                 title: ep.title,
+                                zIndexOffset: isCurrent ? 1000 : 0,
                             })
                                 .addTo(map)
                                 .bindPopup(buildPopupHtml(null), {
@@ -509,8 +644,13 @@
                             bounds.push([ep.lat, ep.lng]);
                         });
 
-                        // Fit the map to all pins (with a little padding)
-                        if (bounds.length > 1) {
+                        // On an episode's own page, focus the map on that
+                        // episode's intersection rather than fitting all
+                        // pins — the hub page (no current-episode match)
+                        // keeps the citywide view.
+                        if (FOCUS_ON_CURRENT_EPISODE && currentEp) {
+                            map.setView([currentEp.lat, currentEp.lng], 16);
+                        } else if (bounds.length > 1) {
                             map.fitBounds(bounds, { padding: [40, 40] });
                         } else if (bounds.length === 1) {
                             map.setView(bounds[0], 15);
